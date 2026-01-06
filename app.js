@@ -23,8 +23,9 @@ async function readConfig() {
       const data = await fs.readFile('./config/DatabaseConnectionConfiguration.json', 'utf8');
       const jsonData = JSON.parse(data);
       const cfg = jsonData.filter(data => data.Datasource == "SUPPORTTOOLMONGODB")[0]
-      const userpass = cfg.User != '' ? `${cfg.User}:${cfg.Password}@` : ''
-      return `${cfg.Protocol}://${userpass}${cfg.Host}:${cfg.Port}/${cfg.Database}?authSource=admin`
+      const userpass = cfg.User && cfg.Password ? `${cfg.User}:${cfg.Password}@` : ''
+      const port = cfg.Protocol == 'mongodb+srv' ? '' : `:${cfg.Port}`
+      return `${cfg.Protocol}://${userpass}${cfg.Host}${port}/${cfg.Database}?retryWrites=true&w=majority&authSource=admin`
     } catch (err) {
       console.log("Error reading DatabaseConnectionConfiguration.json:", err);
       return null
